@@ -1476,8 +1476,10 @@
             });
         }
 
+        // UPDATED: Now triggers Firebase Master Sync
         async function saveMasterConfig() {
             localStorage.setItem('krispy_master_lists', JSON.stringify({ trips, products }));
+            if (typeof window.syncMasterToFirebase === 'function') window.syncMasterToFirebase();
         }
 
         function getStorageKey(dateStr) {
@@ -2172,9 +2174,11 @@
             }
         }
 
+        // UPDATED: Now triggers Firebase Master Sync
         async function saveGlobalRecipes() {
             localStorage.setItem('krispy_recipes_global', JSON.stringify(recipeMap));
             localStorage.setItem('krispy_mix_presets', JSON.stringify(mixPresets));
+            if (typeof window.syncMasterToFirebase === 'function') window.syncMasterToFirebase();
         }
 
         function showRecipeBuilder() {
@@ -3066,7 +3070,57 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 1. UPLOAD DATA TO FIREBASE (Overwrites the specific date document)
+    // ==========================================
+    // NEW: SYNC MASTER SETTINGS TO FIREBASE
+    // ==========================================
+    async function syncMasterToFirebase() {
+        try {
+            // Target a specific document inside a "settings" folder
+            const docRef = doc(db, "settings", "master_config");
+            await setDoc(docRef, {
+                trips: window.trips || [],
+                products: window.products || {},
+                recipeMap: window.recipeMap || {},
+                mixPresets: window.mixPresets || {},
+                updatedAt: new Date().toISOString()
+            });
+            console.log("Master settings successfully backed up to cloud.");
+        } catch (error) {
+            console.error("Error syncing master settings: ", error);
+        }
+    }
+
+    // ==========================================
+    // NEW: PULL MASTER SETTINGS FROM FIREBASE
+    // ==========================================
+    async function loadMasterFromFirebase() {
+        try {
+            const docRef = doc(db, "settings", "master_config");
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                
+                // Update local memory with Cloud memory
+                if (data.trips) window.trips = data.trips;
+                if (data.products) window.products = data.products;
+                if (data.recipeMap) window.recipeMap = data.recipeMap;
+                if (data.mixPresets) window.mixPresets = data.mixPresets;
+
+                // Force the UI to visually refresh using the downloaded settings
+                if (typeof window.renderAll === "function") window.renderAll();
+                if (typeof window.populateSkuDropdown === "function") window.populateSkuDropdown();
+                if (typeof window.populatePresetDropdown === "function") window.populatePresetDropdown();
+                if (typeof window.renderRecipeList === "function") window.renderRecipeList();
+                
+                console.log("Master settings downloaded from cloud.");
+            }
+        } catch (error) {
+            console.error("Error loading master settings: ", error);
+        }
+    }
+
+    // 1. UPLOAD DAILY DATA TO FIREBASE
     async function saveSheetToFirebase(silent = false) {
         try {
             const dateInput = document.querySelector('.date-field input');
@@ -3093,7 +3147,6 @@
                 }
             });
 
-            // Target a specific document named after today's date (e.g. "2024-05-20")
             const docRef = doc(db, "processing_sheets", selectedDate);
             await setDoc(docRef, {
                 date: selectedDate,
@@ -3110,14 +3163,13 @@
         }
     }
 
-    // 2. DOWNLOAD DATA FROM FIREBASE
+    // 2. DOWNLOAD DAILY DATA FROM FIREBASE
     async function loadSheetFromFirebase() {
         try {
             const dateInput = document.querySelector('.date-field input');
             if (!dateInput || !dateInput.value) return;
             const selectedDate = dateInput.value;
 
-            // Look for the specific document for this exact date
             const docRef = doc(db, "processing_sheets", selectedDate);
             const docSnap = await getDoc(docRef);
             
@@ -3148,19 +3200,24 @@
         }
     }
 
-    // Connect functions to the global window
+    // Connect everything to the global window
     window.saveSheetToFirebase = saveSheetToFirebase;
     window.loadSheetFromFirebase = loadSheetFromFirebase;
+    window.syncMasterToFirebase = syncMasterToFirebase;
 
-    // Hijack date changing logic
+    // Hijack date changing logic to fetch data
     const nativeLoadDateSheet = window.loadDateSheet;
     window.loadDateSheet = function() {
         if (typeof nativeLoadDateSheet === "function") nativeLoadDateSheet();
         setTimeout(() => { loadSheetFromFirebase(); }, 200);
     };
 
-    // FORCE INITIAL LOAD: Wait a tiny bit for the UI to build, then fetch data
-    setTimeout(() => { loadSheetFromFirebase(); }, 800);
+    // FORCE INITIAL LOAD: Fetch Master Settings FIRST, then fetch today's quantities
+    setTimeout(() => { 
+        loadMasterFromFirebase().then(() => {
+            loadSheetFromFirebase(); 
+        });
+    }, 800);
 
   </script>
 </body>
