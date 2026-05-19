@@ -4,24 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Krispy Kreme Processing Sheet</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            min-height: 100vh; /* Ensures the background covers the whole screen */
-            
-            /* 🍩 Default fallback color + Your Hosted Custom Background */
+            min-height: 100vh;
             background-color: #2a3b32; 
             background-image: url('https://i.ibb.co/bjbMwk4w/Background.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            
             padding: 20px;
             font-size: 12px;
             color: #333;
-            transition: background-image 0.5s ease;
         }
         
         #bg-video {
@@ -32,7 +27,6 @@
             height: 60vh; 
             object-fit: cover;
             z-index: -1;
-            /* Made the background video much more noticeable */
             opacity: 0.85; 
             pointer-events: none;
             filter: brightness(1.2) blur(1px);
@@ -42,17 +36,14 @@
         }
 
         body.ui-visible #bg-video {
-            /* Reduced blur when UI is visible to keep the video popping */
             filter: brightness(1.1) blur(2px);
         }
 
-        /* 🌟 User's Updated Master Wrapper */
         .container-custom {
             max-width: 1400px;
             margin: 0 auto;
             position: relative;
             padding: 20px; 
-            /* Removed frosted glass from main wrapper as requested */
             background: transparent;
             backdrop-filter: none;
             box-shadow: none;
@@ -61,7 +52,6 @@
             transition: background 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
         }
 
-        /* Soft Rounded "Bond Paper" Inner Containers */
         .bond-paper-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(8px);
@@ -117,7 +107,6 @@
 
         .calendar-nav {
             display: flex; align-items: center; gap: 12px;
-            /* Reduced opacity to 10% */
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
             padding: 8px 16px; border-radius: 40px;
@@ -127,7 +116,6 @@
         }
         .calendar-nav:hover {
             transform: translateY(-2px);
-            /* Casts a light glowing shadow on hover */
             background: rgba(255, 255, 255, 0.15);
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.4), inset 0 1px 2px rgba(255,255,255,0.2);
         }
@@ -152,7 +140,6 @@
             transform: scale(0.92);
         }
         .date-field {
-            /* Set text to white for visibility on low opacity */
             color: #ffffff; padding: 2px 8px; font-size: 15px; font-weight: 900;
             display: flex; align-items: center; gap: 8px; background: transparent;
             text-shadow: 0 1px 3px rgba(0,0,0,0.6);
@@ -171,12 +158,7 @@
             box-shadow: 0 0 0 2px rgba(0,103,71,0.2); 
         }
 
-        .table-container { 
-            width: 100%; 
-            overflow: visible; 
-            background: transparent; 
-        }
-        
+        .table-container { width: 100%; overflow: visible; background: transparent; }
         table { width: 100%; border-collapse: collapse; min-width: 800px; }
         
         thead th { 
@@ -187,7 +169,6 @@
             border: 1px solid #e5e7eb;
             border-bottom: 2px solid #006747;
         }
-
         th, td { border: 1px solid #e5e7eb; padding: 8px 6px; text-align: center; vertical-align: middle; }
 
         .product-col { text-align: left; padding-left: 10px; font-size: 14px; font-weight: 700; color: #111827; }
@@ -225,7 +206,6 @@
 
         .controls {
             padding: 15px 20px; 
-            /* Reduced opacity to 5% */
             background: rgba(255, 255, 255, 0.05); 
             backdrop-filter: blur(4px); 
             border-radius: 12px;
@@ -236,7 +216,6 @@
         .controls-row { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; width: 100%; }
         .control-group { background: transparent; padding: 0; border-radius: 0; border: none; flex: 0 1 auto; min-width: auto; box-shadow: none; display: flex; align-items: center; gap: 8px; }
         
-        /* Made headers white to be visible against 5% opacity dark background */
         .control-group h3 { font-size: 13px; color: #ffffff; margin: 0; font-weight: 800; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         
         .control-group input, .control-group select {
@@ -257,12 +236,10 @@
             transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative; overflow: hidden;
         }
-
         .control-btn:hover, .save-sheet-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.3);
         }
-
         .control-btn:active, .save-sheet-btn:active {
             transform: scale(0.96) translateY(2px);
             box-shadow: 0 2px 3px rgba(0,0,0,0.1), inset 0 2px 4px rgba(0,0,0,0.2);
@@ -274,18 +251,13 @@
         .btn-red:hover { background: #f23d30; }
 
         .remove-product, .remove-trip-btn {
-            position: absolute; 
-            width: 24px; height: 24px; padding: 0;
+            position: absolute; width: 24px; height: 24px; padding: 0;
             display: flex; align-items: center; justify-content: center;
             font-size: 16px; font-weight: bold; line-height: 1; 
-            cursor: pointer; z-index: 100;
-            border-radius: 50%;
+            cursor: pointer; z-index: 100; border-radius: 50%;
             border: 1px solid rgba(255, 255, 255, 0.5);
-            background: #da291c;
-            color: #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: all 0.2s;
-            display: none; 
+            background: #da291c; color: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.2s; display: none; 
         }
         .remove-trip-btn { top: -8px; right: -8px; width: 22px; height: 22px; font-size: 14px; }
         .product-row .remove-product { left: 4px; top: 50%; transform: translateY(-50%); }
@@ -334,34 +306,19 @@
         .toast.error { border-color: #dc3545; color: #dc3545; }
 
         .footer-controls { 
-            padding: 15px; 
-            text-align: center; 
-            color: #111; 
-            font-size: 12px; 
-            font-weight: bold; 
-            background: rgba(255, 255, 255, 0.8); 
-            backdrop-filter: blur(8px); 
-            border-radius: 12px; 
-            margin-top: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: 15px; text-align: center; color: #111; font-size: 12px; font-weight: bold; 
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); border-radius: 12px; margin-top: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
 
         .subtle-toggle-open {
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            /* White text for contrast on 10% opacity */
             color: #ffffff; font-size: 15px; font-weight: 800; letter-spacing: 0.5px;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-            /* Reduced opacity to 10% */
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(4px);
-            padding: 12px 28px; border-radius: 999px; cursor: pointer;
-            border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-shadow: 0 1px 4px rgba(0,0,0,0.6); background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(4px); padding: 12px 28px; border-radius: 999px; cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.2); transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         .subtle-toggle-open:hover { 
-            /* Light glowing shadow on hover */
-            background: rgba(255, 255, 255, 0.2); 
-            transform: translateY(-2px); 
+            background: rgba(255, 255, 255, 0.2); transform: translateY(-2px); 
             box-shadow: 0 0 15px rgba(255, 255, 255, 0.5), inset 0 1px 2px rgba(255,255,255,0.2); 
         }
 
@@ -429,24 +386,15 @@
         input[type="number"].rb-ing-input { text-align: center; }
         input[type="text"].rb-ing-input:focus, input[type="number"].rb-ing-input:focus { border-color: #006747; box-shadow: 0 0 0 2px rgba(0,103,71,0.2); }
 
-        /* 🌟 WIP CARD MASONRY STYLES */
         .wip-grid, .glaze-grid { 
             margin-top: 15px; display: flex; flex-direction: row; flex-wrap: wrap; 
             gap: 15px; align-items: flex-start; align-content: flex-start; justify-content: flex-start; 
         }
         
         .wip-card-new, .glaze-card { 
-            background: #ffffff;
-            flex: 1;
-            min-width: 300px;
-            max-width: calc(33.333% - 10px); 
-            border-radius: 12px; 
-            border: 2px solid #e5e7eb; 
-            padding: 18px 20px; 
-            box-shadow: 0 6px 15px rgba(0,0,0,0.05); 
-            color: black; 
-            position: relative; 
-            box-sizing: border-box;
+            background: #ffffff; flex: 1; min-width: 300px; max-width: calc(33.333% - 10px); 
+            border-radius: 12px; border: 2px solid #e5e7eb; padding: 18px 20px; 
+            box-shadow: 0 6px 15px rgba(0,0,0,0.05); color: black; position: relative; box-sizing: border-box;
         }
         
         .wip-card-new .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; gap: 10px; }
@@ -483,11 +431,12 @@
         body.sheet-locked .remove-trip-btn, body.sheet-locked .remove-product { display: none !important; }
         body.sheet-locked .product-row { pointer-events: none; cursor: default; }
 
-        /* 🖨️ NATIVE ROBUST PRINTING CSS INTEGRATION */
         @media print {
             @page { margin: 10mm; }
             html, body { width: 100%; height: auto; background: white !important; margin: 0; padding: 0; overflow: visible !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size: 12px !important; }
             body > *:not(.container-custom) { display: none !important; }
+            
+            .print-page-break { page-break-before: always !important; }
             
             .container-custom, .bond-paper-container, .bond-paper-container-large { 
                 position: relative; left: 0; top: 0; width: 100%; max-width: 100%; 
@@ -500,26 +449,15 @@
                 display: none !important; 
             }
             
-            /* Unified Global Print Header Logic */
-            body.show-print-header #globalPrintHeaderWrapper {
-                display: block !important;
-                margin-bottom: 20px;
-            }
+            body.show-print-header #globalPrintHeaderWrapper { display: block !important; margin-bottom: 20px; }
             
-            /* Add beautiful rounded corners for the print banner */
             #globalPrintHeaderWrapper .header { 
                 display: flex !important; width: 100% !important; margin-bottom: 20px !important; 
-                border: none !important; 
-                border-radius: 20px !important; 
-                padding: 15px 25px !important; 
-                align-items: center; justify-content: space-between;
-                box-sizing: border-box !important;
-                background: #006747 !important; 
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                border: none !important; border-radius: 20px !important; padding: 15px 25px !important; 
+                align-items: center; justify-content: space-between; box-sizing: border-box !important;
+                background: #006747 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
 
-            /* Standardized Data Table Printing */
             .table-container { overflow: visible !important; width: 100%; max-height: none !important; }
             table { width: 100% !important; min-width: 100% !important; border-collapse: collapse !important; table-layout: auto !important; }
             tr { page-break-inside: avoid; }
@@ -538,7 +476,6 @@
             .sku-col { width: auto !important; min-width: 60px !important; white-space: nowrap !important; }
             .editable-sku { width: 100% !important; min-width: 60px !important; text-align: center !important; border: none !important; background: transparent !important; font-size: 13px !important; }
 
-            /* WIP & Glaze Horizonal Strict Grid */
             .wip-grid, .glaze-grid { 
                 display: flex !important; flex-wrap: wrap !important; gap: 10px !important; 
                 flex-direction: row !important; justify-content: flex-start !important; width: 100% !important;
@@ -558,27 +495,17 @@
             #glazeScheduleContainer { display: block !important; width: 100% !important; page-break-before: auto !important; margin-top: 20px !important; }
             #glazeHeader > div { display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 10px !important; text-align: center !important; }
             
-            /* Delivery Receipt specific scaling */
             #deliveryReceiptView .dr-container, #deliveryReceiptView .dr-table-wrapper { overflow: visible !important; width: 100% !important; min-width: 0 !important; max-width: 100% !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important;}
             #deliveryReceiptView .dr-container table th { font-size: 16px !important; font-weight: bold !important; padding: 12px 8px !important; }
             #deliveryReceiptView .dr-container table td { font-size: 14px !important; padding: 12px 8px !important; }
             #deliveryReceiptView .dr-table-wrapper h2 { font-size: 26px !important; }
             #deliveryReceiptView .dr-table-wrapper h3 { font-size: 18px !important; }
-            #deliveryReceiptView .print-only-signatories { display: flex !important; font-size: 14px !important; margin-top: 50px !important; }
+            #deliveryReceiptView .print-only-signatories, #wipView .print-only-signatories { display: flex !important; font-size: 14px !important; margin-top: 50px !important; }
         }
     </style>
     <style id="printPageStyle"></style>
 </head>
 <body>
-    <div id="introVideoContainer" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:#000; z-index:99998; flex-direction:column; align-items:center; justify-content:center; transition: opacity 0.5s ease; opacity: 0;">
-        <div id="videoErrorMsg" style="display:none; position:absolute; z-index:10; background: #da291c; border: 3px solid #006747; color: white; padding: 15px 30px; border-radius: 4px; font-weight: bold; text-align: center;">
-            ⚠️ Cannot find 'ae_e_cmp_.mp4' !<br>Make sure the video file is placed exactly on your Desktop next to this HTML file.
-        </div>
-        <video id="introVideo" playsinline muted controls preload="auto" style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover;">
-            <source src="ae_e_cmp_.mp4" type="video/mp4" onerror="document.getElementById('videoErrorMsg').style.display='block'">
-        </video>
-        <button class="control-btn btn-green" style="position: absolute; bottom: 40px; z-index: 10;" onclick="skipIntro()">Skip Intro ⏭️</button>
-    </div>
 
     <video id="bg-video" autoplay loop muted playsinline>
         <source src="https://www.manna360.com.sg/media/wysiwyg/krispy-kreme.mp4" type="video/mp4">
@@ -604,7 +531,7 @@
         </div>
     </div>
     
-    <div id="mainView" class="container-custom ui-hidden">
+    <div id="mainView" class="container-custom">
         <div class="header hide-pdf">
             <div class="header-left hide-on-toggle">
                 <img id="brandLogoImg" src="logo.png" 
@@ -676,15 +603,9 @@
                         <option value="og">Original Glazed</option>
                         <option value="ug">Unglazed</option>
                         <option value="ds">Dry Shell</option>
-                        <option value="star">Star Shaped</option>
-                        <option value="heart">Heart Shaped</option>
-                        <option value="beignet">Beignet</option>
-                        <option value="skull">Skull Shaped</option>
                         <option value="churro">Churro</option>
                         <option value="minis">Minis</option>
-                        <option value="bites">Bites</option>
                         <option value="cakes">Cakes</option>
-                        <option value="cakeholes">Cake Holes</option>
                     </select>
                     <select id="prodBadge" style="width:105px;">
                         <option value="none">-- Badge --</option>
@@ -700,23 +621,14 @@
                 </div>
             </div>
 
-            <div class="controls-row" style="justify-content: space-between; align-items: center;">
-                <div style="display: flex; gap: 8px;">
-                    <button class="save-sheet-btn btn-green" id="bgmBtn" onclick="toggleMusic()">🎵 Play BGM</button>
-                    <input type="file" id="localBgmUpload" accept="audio/*" style="display:none;" onchange="handleLocalBgm(event)">
-                    <button class="save-sheet-btn btn-green" onclick="document.getElementById('localBgmUpload').click()" style="opacity: 0.85;">📂 Custom MP3</button>
-                    
-                    <input type="file" id="localBgUpload" accept="image/*" style="display:none;" onchange="handleLocalBg(event)">
-                    <button class="save-sheet-btn btn-green" onclick="document.getElementById('localBgUpload').click()" style="opacity: 0.85;">🖼️ Custom BG</button>
-                </div>
-                
+            <div class="controls-row" style="justify-content: flex-end; align-items: center;">
                 <div style="display: flex; gap: 8px;">
                     <button class="save-sheet-btn btn-green hide-when-locked" onclick="exportMasterData()" style="opacity: 0.85;">💾 Export Backup</button>
                     <button class="save-sheet-btn btn-green hide-when-locked" onclick="triggerImport()" style="opacity: 0.85;">📂 Import Backup</button>
                     <input type="file" id="importBackupInput" accept=".json" style="display:none;" onchange="importMasterData(event)">
                 </div>
 
-                <div style="display: flex; gap: 8px;">
+                <div style="display: flex; gap: 8px; margin-left: 15px;">
                     <button class="control-btn btn-red hide-when-locked" onclick="confirmClearAll()" style="opacity: 0.85;">🗑️ Clear Qty</button>
                     <button class="control-btn btn-red hide-when-locked" onclick="confirmReset()" style="opacity: 0.85;">↩️ Reset Template</button>
                 </div>
@@ -761,8 +673,6 @@
             </div>
         </div>
     </div>
-
-    <audio id="nativeAudioPlayer" preload="none"></audio>
 
     <div id="toast-container"></div>
 
@@ -863,14 +773,37 @@
             </div>
         </div>
 
-        <div id="wipGridContainer" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); padding: 25px; border-radius: 20px; border: 1px solid rgba(0,103,71,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
-            <div id="wipGrid" class="wip-grid"></div>
+        <div id="wipNoDataGlobal" style="display:none; padding: 60px 40px; text-align:center; color:#111; background:rgba(255,255,255,0.85); border-radius:20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border:2px dashed rgba(0,103,71,0.4); backdrop-filter:blur(12px); margin: 20px auto; max-width: 700px;">
+            <div style="font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">🍩</div>
+            <h3 style="font-size: 20px; color: #006747; margin-bottom: 12px; font-weight: bold;">No Recipes or Quantities Mapped</h3>
+            <p style="font-size: 13px; color: #444; max-width: 500px; margin: 0 auto; line-height: 1.6;">
+                Your WIP Plan is currently empty.
+            </p>
         </div>
 
-        <div class="print-only-signatories">
-            <div>
-                <div class="sig-line"></div>
-                <strong style="font-size: 14px; text-transform: uppercase;">Prepared By</strong>
+        <div id="wipGridContainerCore" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); padding: 25px; border-radius: 20px; border: 1px solid rgba(0,103,71,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <h3 class="hide-pdf" style="color:#006747; font-weight:900; margin-bottom:15px; font-size: 18px; border-bottom: 2px solid #006747; padding-bottom: 8px; text-transform: uppercase;">🍩 Core & Regular Varieties</h3>
+            <div style="display:none; background: #006747; color: white; padding: 10px 15px; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; border-radius: 6px;" class="print-only-header">PAGE 1: CORE & REGULAR</div>
+            <div id="wipGridCore" class="wip-grid"></div>
+            <div class="print-only-signatories">
+                <div>
+                    <div class="sig-line"></div>
+                    <strong style="font-size: 14px; text-transform: uppercase;">Prepared By</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="print-page-break" style="height: 20px;"></div>
+
+        <div id="wipGridContainerLto" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); padding: 25px; border-radius: 20px; border: 1px solid rgba(185, 28, 28, 0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <h3 class="hide-pdf" style="color:#b91c1c; font-weight:900; margin-bottom:15px; font-size: 18px; border-bottom: 2px solid #b91c1c; padding-bottom: 8px; text-transform: uppercase;">🌟 LTO & OSMI Varieties</h3>
+            <div style="display:none; background: #b91c1c; color: white; padding: 10px 15px; font-weight: bold; text-align: center; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; border-radius: 6px;" class="print-only-header">PAGE 2: LTO & OSMI</div>
+            <div id="wipGridLto" class="wip-grid"></div>
+            <div class="print-only-signatories">
+                <div>
+                    <div class="sig-line"></div>
+                    <strong style="font-size: 14px; text-transform: uppercase;">Prepared By</strong>
+                </div>
             </div>
         </div>
     </div>
@@ -997,15 +930,9 @@
                         <option value="OG">OG (Orig Glaze)</option>
                         <option value="UG">UG (Unglazed)</option>
                         <option value="DS">DS (Dry Shell)</option>
-                        <option value="STAR">STAR (Star Shaped)</option>
-                        <option value="HEART">HEART (Heart Shaped)</option>
-                        <option value="BEIGNET">BEIGNET</option>
-                        <option value="SKULL">SKULL</option>
                         <option value="CHURRO">CHURRO</option>
                         <option value="MINIS">MINIS</option>
-                        <option value="BITES">BITES</option>
                         <option value="CAKES">CAKES</option>
-                        <option value="CAKE HOLES">CAKE HOLES</option>
                         <optgroup label="Common Variants">
                             <option value="OG MINI">OG MINI</option>
                             <option value="UG MINI">UG MINI</option>
@@ -1045,8 +972,6 @@
     </div>
 
     <script>
-        const CUSTOM_GDRIVE_BGM = "https://drive.google.com/file/d/1jsEPrJ1dm47RjAsc1FgEjrTaBp9IbvHl/view?usp=drive_link";  
-        
         const badgeData = {
             'worlds_famous': { label: "World's Famous", class: 'badge-worlds-famous' },
             'core': { label: "Core", class: 'badge-core' },
@@ -1055,21 +980,13 @@
             'osmi': { label: "OSMI", class: 'badge-osmi' }
         };
 
-        function getDriveAudioLink(url) {
-            if (!url) return null;
-            const match = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-            if (match && match[1]) {
-                return `https://drive.google.com/uc?export=download&id=${match[1]}`;
-            }
-            return url; 
-        }
-
         const defaultTrips = [
             { code: '8926', name: 'KK - Cebu I.T.\nPark' },
             { code: '8928', name: 'KK - Ayala\nCenter' },
             { code: '8926', name: 'Galleria\nSelling' }
         ];
 
+        // Ghost categories purged
         const defaultProducts = {
             og: [
                 { sku: '81016790', name: 'V.3 Original Glazed Doughnut 12pcs/dozen', badge: 'worlds_famous' },
@@ -1090,10 +1007,6 @@
                 { sku: '81017077', name: 'PB & JELLY', badge: 'lto' },
                 { sku: '81017078', name: 'New York Cheesecake', badge: 'worlds_famous' }
             ],
-            star: [],
-            heart: [],
-            beignet: [],
-            skull: [],
             churro: [
                 { sku: '82050001', name: 'Classic Cinnamon Churro 12pcs/dozen', badge: 'none' },
                 { sku: '82050002', name: 'Chocolate Dipped Churro 12pcs/dozen', badge: 'none' }
@@ -1102,27 +1015,23 @@
                 { sku: '82060001', name: 'Mini Original Glazed 24pcs/dozen', badge: 'none' },
                 { sku: '82060002', name: 'Mini Chocolate Iced 24pcs/dozen', badge: 'none' }
             ],
-            bites: [],
             cakes: [
                 { sku: '82080001', name: 'Birthday Cake Doughnut 12pcs/dozen', badge: 'none' },
                 { sku: '82080002', name: 'Red Velvet Cake Doughnut 12pcs/dozen', badge: 'none' }
-            ],
-            cakeholes: []
+            ]
         };
 
         const sectionNames = {
             og: 'ORIGINAL GLAZED', ug: 'UNGLAZED', ds: 'DRY SHELL',
-            star: 'STAR SHAPED', heart: 'HEART SHAPED', beignet: 'BEIGNET',
-            skull: 'SKULL SHAPED', churro: 'CHURRO', minis: 'MINIS',
-            bites: 'BITES', cakes: 'CAKES', cakeholes: 'CAKE HOLES'
+            churro: 'CHURRO', minis: 'MINIS', cakes: 'CAKES'
         };
 
         const trayDivisor = {
-            'churro': 24, 'minis': 16, 'bites': 40, 'cakeholes': 40
+            'churro': 24, 'minis': 16
         };
 
-        const specialCats = ['churro', 'minis', 'bites', 'cakeholes'];
-        const categoryOrder = ['og', 'ug', 'ds', 'star', 'heart', 'beignet', 'skull', 'churro', 'minis', 'bites', 'cakes', 'cakeholes'];
+        const specialCats = ['churro', 'minis'];
+        const categoryOrder = ['og', 'ug', 'ds', 'churro', 'minis', 'cakes'];
 
         var recipeMap = {};
         var mixPresets = {}; 
@@ -1131,38 +1040,10 @@
         var selectedRow = null;
         var currentEditRecipeId = null;
         var currentLayout = {}; 
-        var isMusicPlaying = false;
         var currentProductionPlan = null;
         var isUiHidden = true;
         var isToggling = false; 
         var unlockedDates = {}; 
-
-        // === LOCAL BACKGROUND HANDLING ===
-        function handleLocalBg(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.body.style.backgroundImage = `url('${e.target.result}')`;
-                    try {
-                        localStorage.setItem('krispy_custom_bg', e.target.result);
-                    } catch(err) {
-                        console.warn("Image too large to save to localStorage, it will only last for this session.");
-                    }
-                    showToast("Custom background applied successfully!");
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-        
-        // Restore background on load
-        window.addEventListener('load', () => {
-            const savedBg = localStorage.getItem('krispy_custom_bg');
-            if (savedBg) {
-                document.body.style.backgroundImage = `url('${savedBg}')`;
-            }
-        });
-        // ===================================
 
         function ensureVideosPlaying() {
             ['bg-video'].forEach(id => {
@@ -1184,6 +1065,10 @@
                 });
             });
 
+            // Replaces Intro Video logic and instantly shows the UI
+            document.body.classList.add('ui-visible');
+            isUiHidden = false;
+
             initDate();
             ensureVideosPlaying();
         };
@@ -1197,9 +1082,6 @@
             }, 500); 
         });
 
-        // =========================================================================
-        // 🖨️ ADVANCED NATIVE BROWSER PRINT TRIGGER
-        // =========================================================================
         function preparePrint(viewId) {
             const styleEl = document.getElementById('printPageStyle');
             styleEl.innerHTML = `@media print { @page { margin: 10mm; } }`;
@@ -1227,89 +1109,6 @@
             }, 300);
         }
 
-        function handleLocalBgm(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const audioUrl = URL.createObjectURL(file);
-                const audio = document.getElementById('nativeAudioPlayer');
-                audio.src = audioUrl;
-                
-                const btn = document.getElementById('bgmBtn');
-                audio.play().then(() => {
-                    isMusicPlaying = true;
-                    btn.innerHTML = '🔇 Stop BGM';
-                    btn.className = 'save-sheet-btn btn-red';
-                    showToast(`Playing local file: ${file.name}`);
-                }).catch(e => {
-                    showToast("Browser prevented audio play. Please click 'Play BGM Now' manually.", "error");
-                });
-            }
-        }
-
-        function playScheduledBGM() {
-            const audio = document.getElementById('nativeAudioPlayer');
-            const btn = document.getElementById('bgmBtn');
-            
-            if (!audio.getAttribute('src')) {
-                const driveAudio = getDriveAudioLink(CUSTOM_GDRIVE_BGM);
-                if (driveAudio) {
-                    audio.src = driveAudio;
-                } else {
-                    audio.src = "https://ia903204.us.archive.org/16/items/magic-moments-perry-como/Magic%20Moments%20-%20Perry%20Como.mp3"; 
-                }
-            }
-            
-            audio.play().then(() => {
-                isMusicPlaying = true;
-                if(btn) {
-                    btn.innerHTML = '🔇 Stop BGM';
-                    btn.className = 'save-sheet-btn btn-red';
-                }
-            }).catch(err => {
-                console.log("Auto-play blocked by browser. User interaction needed:", err);
-            });
-        }
-
-        function toggleMusic() {
-            const audio = document.getElementById('nativeAudioPlayer');
-            const btn = document.getElementById('bgmBtn');
-
-            if (isMusicPlaying) {
-                audio.pause();
-                audio.currentTime = 0; // Reset to start
-                isMusicPlaying = false;
-                btn.innerHTML = '🎵 Play BGM';
-                btn.className = 'save-sheet-btn btn-green';
-                showToast("Music stopped.");
-            } else {
-                playScheduledBGM();
-                showToast("Playing Music...");
-            }
-        }
-
-        document.getElementById('nativeAudioPlayer').addEventListener('ended', function() {
-            isMusicPlaying = false;
-            const btn = document.getElementById('bgmBtn');
-            if (btn) {
-                btn.innerHTML = '🎵 Play BGM';
-                btn.className = 'save-sheet-btn btn-green';
-            }
-        });
-
-        let lastPlayedMinute = -1;
-        setInterval(() => {
-            if (isUiHidden) return;
-            const now = new Date();
-            const mins = now.getMinutes();
-            if ((mins === 0 || mins === 30) && mins !== lastPlayedMinute) {
-                lastPlayedMinute = mins;
-                playScheduledBGM();
-            }
-            if (mins !== 0 && mins !== 30) {
-                lastPlayedMinute = -1;
-            }
-        }, 1000); 
-
         function toggleMainUI() {
             if (isToggling) return; 
             
@@ -1330,35 +1129,7 @@
                 container.classList.remove('ui-hidden');
                 document.body.classList.add('ui-visible');
                 isUiHidden = false;
-                
-                setTimeout(() => { 
-                    playScheduledBGM();
-                }, 400);
             }
-        }
-
-        function skipIntro() {
-            const introVideo = document.getElementById('introVideo');
-            introVideo.pause();
-            finishIntro(document.getElementById('mainView'));
-        }
-
-        function finishIntro(container) {
-            const introContainer = document.getElementById('introVideoContainer');
-            introContainer.style.opacity = '0';
-            
-            setTimeout(() => {
-                introContainer.style.display = 'none';
-            }, 500);
-
-            container.classList.remove('ui-hidden');
-            document.body.classList.add('ui-visible');
-            isUiHidden = false;
-            
-            setTimeout(() => { 
-                isToggling = false; 
-                playScheduledBGM();
-            }, 800);
         }
 
         let modalAction = null;
@@ -1425,13 +1196,10 @@
             loadDateSheet();
         }
 
-        // --- AUTO-SAVE LOGIC ---
         let autoSaveTimeout = null;
         window.triggerAutoSave = function() {
-            // 1. Immediately save to browser storage instantly
             if (typeof saveCurrentSheet === 'function') saveCurrentSheet(true);
             
-            // 2. Wait 2.5 seconds after the user STOPS typing, then push to Firebase
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = setTimeout(() => {
                 if (typeof window.saveSheetToFirebase === 'function') {
@@ -1476,7 +1244,6 @@
             });
         }
 
-        // UPDATED: Now triggers Firebase Master Sync
         async function saveMasterConfig() {
             localStorage.setItem('krispy_master_lists', JSON.stringify({ trips, products }));
             if (typeof window.syncMasterToFirebase === 'function') window.syncMasterToFirebase();
@@ -1631,7 +1398,7 @@
             selectedRow = null;
             updateHint();
 
-            const totalCols = 4 + trips.length; // SKU, Product, Dz, Trips..., Total
+            const totalCols = 4 + trips.length;
             
             const sortedCats = [...categoryOrder].filter(c => products[c]).sort((a, b) => {
                 const isACollapsed = currentLayout[a] || false;
@@ -1644,9 +1411,7 @@
                 const isCollapsed = currentLayout[cat] || false;
                 
                 let uom = 'DZ';
-                if (['bites', 'cakeholes'].includes(cat)) {
-                    uom = 'PCS';
-                } else if (specialCats.includes(cat)) {
+                if (specialCats.includes(cat)) {
                     uom = 'TRAYS';
                 }
                 const headerUomDisplay = uom === 'DZ' ? 'DOZEN' : uom;
@@ -2174,7 +1939,6 @@
             }
         }
 
-        // UPDATED: Now triggers Firebase Master Sync
         async function saveGlobalRecipes() {
             localStorage.setItem('krispy_recipes_global', JSON.stringify(recipeMap));
             localStorage.setItem('krispy_mix_presets', JSON.stringify(mixPresets));
@@ -2438,9 +2202,6 @@
             showToast("Recipe saved.");
         }
 
-        // =========================================================================
-        // 🚀 COMPACT CARD MASONRY LOGIC
-        // =========================================================================
         function showWIPPlan() {
             calculateAll();
             document.getElementById('mainView').classList.add('view-hidden');
@@ -2449,11 +2210,15 @@
             document.getElementById('deliveryReceiptView').classList.add('view-hidden');
             document.getElementById('wipView').classList.remove('view-hidden');
             
-            const wipGrid = document.getElementById('wipGrid');
-            wipGrid.innerHTML = '';
+            const wipGridCore = document.getElementById('wipGridCore');
+            const wipGridLto = document.getElementById('wipGridLto');
+            wipGridCore.innerHTML = '';
+            wipGridLto.innerHTML = '';
             
-            let hasData = false;
-            let groupedWip = {}; 
+            let hasCoreData = false;
+            let hasLtoData = false;
+            let groupedWipCore = {}; 
+            let groupedWipLto = {}; 
             
             Object.keys(products).forEach(cat => {
                 products[cat].forEach((prod, pIndex) => {
@@ -2465,12 +2230,18 @@
                     const totalQty = parseInt(totalDisp.innerText) || 0;
                     
                     if (totalQty > 0 && skuRecipes && skuRecipes.length > 0) {
-                        hasData = true;
+                        const bType = prod.badge || 'none';
+                        const isLTO = (bType === 'lto' || bType === 'osmi');
+                        
+                        if (isLTO) hasLtoData = true;
+                        else hasCoreData = true;
+
+                        let groupedWip = isLTO ? groupedWipLto : groupedWipCore;
                         
                         let pcsMultiplier = 12; 
                         if (cat === 'minis') {
                             pcsMultiplier = 16;
-                        } else if (cat === 'bites' || cat === 'cakeholes' || cat === 'churro') {
+                        } else if (cat === 'churro') {
                             pcsMultiplier = 1;
                         } else {
                             const nameLower = prod.name.toLowerCase();
@@ -2520,98 +2291,94 @@
                     }
                 });
             });
-            
-            if (!hasData) {
-                wipGrid.style.display = 'block';
-                wipGrid.innerHTML = `
-                    <div style="padding: 60px 40px; text-align:center; color:#111; background:rgba(255,255,255,0.85); border-radius:20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border:2px dashed rgba(0,103,71,0.4); backdrop-filter:blur(12px); margin: 20px auto; max-width: 700px;">
-                        <div style="font-size: 50px; margin-bottom: 15px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));">🍩</div>
-                        <h3 style="font-size: 20px; color: #006747; margin-bottom: 12px; font-weight: bold;">No Recipes or Quantities Mapped</h3>
-                        <p style="font-size: 13px; color: #444; max-width: 500px; margin: 0 auto; line-height: 1.6;">
-                            Your WIP Plan is currently empty. To generate your batch calculations:
-                            <br><br>
-                            <span style="display:inline-block; text-align:left; background:rgba(255,255,255,0.6); padding: 15px 25px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.8);">
-                                <strong>1.</strong> Create your mixture recipes in the <strong>🛠️ Manage Icing/Filling</strong> builder.<br>
-                                <strong>2.</strong> Add target quantities to those varieties on the main <strong>Processing Sheet</strong>.
-                            </span>
-                        </p>
-                    </div>`;
-            } else {
-                wipGrid.style.display = '';
 
-                let wipArray = Object.keys(groupedWip).map(key => {
-                    let group = groupedWip[key];
-                    let totalPcsSort = 0;
-                    group.products.forEach(p => totalPcsSort += p.pcs);
-                    group.totalPcsForSort = totalPcsSort;
-                    return group;
-                });
-                
-                wipArray.sort((a, b) => {
-                    let heightA = Object.keys(a.components).length + a.products.length;
-                    let heightB = Object.keys(b.components).length + b.products.length;
+            const renderGrid = (hasData, groupedWip, gridElement, emptyMsg) => {
+                if (!hasData) {
+                    gridElement.style.display = 'block';
+                    gridElement.innerHTML = `
+                        <div style="padding: 20px; text-align:center; color:#666; font-style:italic; font-size: 14px;">
+                            ${emptyMsg}
+                        </div>`;
+                } else {
+                    gridElement.style.display = '';
+                    let wipArray = Object.keys(groupedWip).map(key => {
+                        let group = groupedWip[key];
+                        let totalPcsSort = 0;
+                        group.products.forEach(p => totalPcsSort += p.pcs);
+                        group.totalPcsForSort = totalPcsSort;
+                        return group;
+                    });
                     
-                    if (heightB !== heightA) {
-                        return heightB - heightA; 
-                    }
-                    
-                    let widthA = a.title.length;
-                    let widthB = b.title.length;
-                    
-                    if (widthB !== widthA) {
-                        return widthB - widthA; 
-                    }
-                    
-                    return b.totalPcsForSort - a.totalPcsForSort; 
-                });
+                    wipArray.sort((a, b) => {
+                        let heightA = Object.keys(a.components).length + a.products.length;
+                        let heightB = Object.keys(b.components).length + b.products.length;
+                        if (heightB !== heightA) return heightB - heightA; 
+                        let widthA = a.title.length;
+                        let widthB = b.title.length;
+                        if (widthB !== widthA) return widthB - widthA; 
+                        return b.totalPcsForSort - a.totalPcsForSort; 
+                    });
 
-                wipArray.forEach(group => {
-                    let totalPcsInMix = 0;
-                    
-                    let usageHtml = group.products.map(p => {
-                        totalPcsInMix += p.pcs;
-                        return `<div class="pill-target">${p.name} (${p.pcs} pcs)</div>`;
-                    }).join('');
+                    wipArray.forEach(group => {
+                        let totalPcsInMix = 0;
+                        let usageHtml = group.products.map(p => {
+                            totalPcsInMix += p.pcs;
+                            return `<div class="pill-target">${p.name} (${p.pcs} pcs)</div>`;
+                        }).join('');
 
-                    let totalMixLbs = 0;
-                    let tableRowsHtml = '';
+                        let totalMixLbs = 0;
+                        let tableRowsHtml = '';
 
-                    const buildMaterialRow = (ing, data) => {
-                        totalMixLbs += data.finalLbs;
-                        return `
-                            <div class="material-row">
-                                <div class="pill-material">${ing}</div>
-                                <div class="material-qty">${data.finalLbs.toFixed(4)} lbs</div>
+                        if (Object.keys(group.components).length > 0) {
+                            Object.entries(group.components).forEach(([ing, data]) => {
+                                totalMixLbs += data.finalLbs;
+                                tableRowsHtml += `
+                                    <div class="material-row">
+                                        <div class="pill-material">${ing}</div>
+                                        <div class="material-qty">${data.finalLbs.toFixed(4)} lbs</div>
+                                    </div>
+                                `;
+                            });
+                        }
+
+                        const card = document.createElement('div');
+                        card.className = 'wip-card-new';
+                        card.innerHTML = `
+                            <div class="card-header-top">
+                                <span class="confidential-text">CONFIDENTIAL</span>
+                                <div class="pill-title">${group.title}</div>
+                            </div>
+                            <div class="target-container">
+                                ${usageHtml}
+                            </div>
+                            <div class="card-header-main">
+                                <div class="pill-badge">COMPONENTS</div>
+                                <div class="pill-badge">TOTAL IN LBS: ${totalMixLbs.toFixed(4)}</div>
+                            </div>
+                            <div class="materials-list">
+                                ${tableRowsHtml}
                             </div>
                         `;
-                    };
+                        gridElement.appendChild(card);
+                    });
+                }
+            };
 
-                    if (Object.keys(group.components).length > 0) {
-                        Object.entries(group.components).forEach(([ing, data]) => {
-                            tableRowsHtml += buildMaterialRow(ing, data);
-                        });
-                    }
+            renderGrid(hasCoreData, groupedWipCore, wipGridCore, "No Core or Regular quantities mapped to recipes.");
+            renderGrid(hasLtoData, groupedWipLto, wipGridLto, "No LTO or OSMI quantities mapped to recipes.");
+            
+            const containerCore = document.getElementById('wipGridContainerCore');
+            const containerLto = document.getElementById('wipGridContainerLto');
+            const noDataGlobal = document.getElementById('wipNoDataGlobal');
 
-                    const card = document.createElement('div');
-                    card.className = 'wip-card-new';
-                    card.innerHTML = `
-                        <div class="card-header-top">
-                            <span class="confidential-text">CONFIDENTIAL</span>
-                            <div class="pill-title">${group.title}</div>
-                        </div>
-                        <div class="target-container">
-                            ${usageHtml}
-                        </div>
-                        <div class="card-header-main">
-                            <div class="pill-badge">COMPONENTS</div>
-                            <div class="pill-badge">TOTAL IN LBS: ${totalMixLbs.toFixed(4)}</div>
-                        </div>
-                        <div class="materials-list">
-                            ${tableRowsHtml}
-                        </div>
-                    `;
-                    wipGrid.appendChild(card);
-                });
+            if (!hasCoreData && !hasLtoData) {
+                containerCore.style.display = 'none';
+                containerLto.style.display = 'none';
+                noDataGlobal.style.display = 'block';
+            } else {
+                containerCore.style.display = 'block';
+                containerLto.style.display = 'block';
+                noDataGlobal.style.display = 'none';
             }
         }
 
@@ -2690,8 +2457,7 @@
                         }
                         
                         let uom = 'DZ';
-                        if (['bites', 'cakeholes'].includes(cat)) uom = 'PCS';
-                        else if (isSpecial) uom = 'TRAYS';
+                        if (isSpecial) uom = 'TRAYS';
                         
                         tbody.innerHTML += `
                             <tr>
@@ -3070,12 +2836,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // ==========================================
-    // NEW: SYNC MASTER SETTINGS TO FIREBASE
-    // ==========================================
     async function syncMasterToFirebase() {
         try {
-            // Target a specific document inside a "settings" folder
             const docRef = doc(db, "settings", "master_config");
             await setDoc(docRef, {
                 trips: window.trips || [],
@@ -3090,9 +2852,6 @@
         }
     }
 
-    // ==========================================
-    // NEW: PULL MASTER SETTINGS FROM FIREBASE
-    // ==========================================
     async function loadMasterFromFirebase() {
         try {
             const docRef = doc(db, "settings", "master_config");
@@ -3101,13 +2860,11 @@
             if (docSnap.exists()) {
                 const data = docSnap.data();
                 
-                // Update local memory with Cloud memory
                 if (data.trips) window.trips = data.trips;
                 if (data.products) window.products = data.products;
                 if (data.recipeMap) window.recipeMap = data.recipeMap;
                 if (data.mixPresets) window.mixPresets = data.mixPresets;
 
-                // Force the UI to visually refresh using the downloaded settings
                 if (typeof window.renderAll === "function") window.renderAll();
                 if (typeof window.populateSkuDropdown === "function") window.populateSkuDropdown();
                 if (typeof window.populatePresetDropdown === "function") window.populatePresetDropdown();
@@ -3120,7 +2877,6 @@
         }
     }
 
-    // 1. UPLOAD DAILY DATA TO FIREBASE
     async function saveSheetToFirebase(silent = false) {
         try {
             const dateInput = document.querySelector('.date-field input');
@@ -3163,7 +2919,6 @@
         }
     }
 
-    // 2. DOWNLOAD DAILY DATA FROM FIREBASE
     async function loadSheetFromFirebase() {
         try {
             const dateInput = document.querySelector('.date-field input');
@@ -3200,19 +2955,16 @@
         }
     }
 
-    // Connect everything to the global window
     window.saveSheetToFirebase = saveSheetToFirebase;
     window.loadSheetFromFirebase = loadSheetFromFirebase;
     window.syncMasterToFirebase = syncMasterToFirebase;
 
-    // Hijack date changing logic to fetch data
     const nativeLoadDateSheet = window.loadDateSheet;
     window.loadDateSheet = function() {
         if (typeof nativeLoadDateSheet === "function") nativeLoadDateSheet();
         setTimeout(() => { loadSheetFromFirebase(); }, 200);
     };
 
-    // FORCE INITIAL LOAD: Fetch Master Settings FIRST, then fetch today's quantities
     setTimeout(() => { 
         loadMasterFromFirebase().then(() => {
             loadSheetFromFirebase(); 
