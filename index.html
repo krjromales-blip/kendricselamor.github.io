@@ -1425,6 +1425,21 @@
             loadDateSheet();
         }
 
+        // --- AUTO-SAVE LOGIC ---
+        let autoSaveTimeout = null;
+        window.triggerAutoSave = function() {
+            // 1. Immediately save to browser storage instantly
+            if (typeof saveCurrentSheet === 'function') saveCurrentSheet(true);
+            
+            // 2. Wait 2.5 seconds after the user STOPS typing, then push to Firebase
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                if (typeof window.saveSheetToFirebase === 'function') {
+                    window.saveSheetToFirebase(true); 
+                }
+            }, 2500); 
+        };
+
         function loadGlobalLayout() {
             const savedLayout = localStorage.getItem('krispy_global_layout');
             if (savedLayout) {
@@ -1673,7 +1688,7 @@
 
                         let tripInputs = '';
                         for (let t = 0; t < trips.length; t++) {
-                            tripInputs += `<td><input type="number" min="0" value="0" data-trip="${t}" oninput="calculateAll()"></td>`;
+                            tripInputs += `<td><input type="number" min="0" value="0" data-trip="${t}" oninput="calculateAll(); triggerAutoSave();"></td>`;
                         }
 
                         let badgeHtml = '';
@@ -3035,9 +3050,9 @@
 
     </script>
 
-      <script type="module">
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAh0csgKgSar1sUs5lUCd-WQEmGdbIX6Ps",
@@ -3051,8 +3066,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 1. UPLOAD DATA TO FIREBASE
-    async function saveSheetToFirebase() {
+    // 1. UPLOAD DATA TO FIREBASE (Overwrites the specific date document)
+    async function saveSheetToFirebase(silent = false) {
         try {
             const dateInput = document.querySelector('.date-field input');
             const selectedDate = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
@@ -3078,57 +3093,38 @@
                 }
             });
 
-            // Push to Firebase cloud database
-            const docRef = await addDoc(collection(db, "processing_sheets"), {
+            // Target a specific document named after today's date (e.g. "2024-05-20")
+            const docRef = doc(db, "processing_sheets", selectedDate);
+            await setDoc(docRef, {
                 date: selectedDate,
                 sheetData: processingData,
-                createdAt: new Date().toISOString()
+                updatedAt: new Date().toISOString()
             });
 
-            // Also back it up locally to your device cache memory right away
-            let dailyData = {
-                layout: window.currentLayout || {}, 
-                items: {},
-                productionPlan: window.currentProductionPlan || null
-            };
-            processingData.forEach(item => {
-                dailyData.items[item.sku] = { trips: item.quantities };
-            });
-            localStorage.setItem(`krispy_data_${selectedDate}`, JSON.stringify(dailyData));
-
-            showToast("🎉 Sheet successfully saved to Firebase!");
-            alert("🎉 Success! Processing sheet saved to Firebase database.\nDocument ID: " + docRef.id);
+            if (!silent) {
+                showToast("☁️ Sheet successfully synced to Firebase!");
+            }
         } catch (error) {
             console.error("Error saving sheet: ", error);
-            showToast("❌ Firebase Save Failed", "error");
-            alert("❌ Error saving to database. Check browser console.");
+            if (!silent) showToast("❌ Firebase Save Failed", "error");
         }
     }
 
-    // 2. DOWNLOAD DATA FROM FIREBASE (The Missing Piece)
+    // 2. DOWNLOAD DATA FROM FIREBASE
     async function loadSheetFromFirebase() {
         try {
             const dateInput = document.querySelector('.date-field input');
             if (!dateInput || !dateInput.value) return;
             const selectedDate = dateInput.value;
 
-            // Query Firebase for documents matching the active sheet date, getting the newest save first
-            const q = query(
-                collection(db, "processing_sheets"), 
-                where("date", "==", selectedDate),
-                orderBy("createdAt", "desc"),
-                limit(1)
-            );
+            // Look for the specific document for this exact date
+            const docRef = doc(db, "processing_sheets", selectedDate);
+            const docSnap = await getDoc(docRef);
             
-            const querySnapshot = await getDocs(q);
-            
-            if (!querySnapshot.empty) {
-                const latestDoc = querySnapshot.docs[0].data();
-                const sheetItems = latestDoc.sheetData;
+            if (docSnap.exists()) {
+                const sheetItems = docSnap.data().sheetData;
 
-                // Sync it into your visual table rows
                 sheetItems.forEach(item => {
-                    // Try to find the matching row using our SKU data attributes
                     const row = Array.from(document.querySelectorAll('.product-row')).find(r => {
                         const skuInp = r.querySelector('.editable-sku');
                         return skuInp && (skuInp.value || skuInp.textContent || "").trim() === item.sku;
@@ -3144,28 +3140,27 @@
                     }
                 });
 
-                // Recalculate your grand totals on screen so everything visually syncs
-                if (typeof window.calculateAll === "function") {
-                    window.calculateAll();
-                }
-                showToast("☁️ Synced fresh data from Cloud Firebase!");
+                if (typeof window.calculateAll === "function") window.calculateAll();
+                showToast("☁️ Synced fresh data from Cloud!");
             }
         } catch (error) {
-            console.error("Error fetching data from cloud database: ", error);
+            console.error("Error fetching from cloud: ", error);
         }
     }
 
-    // Connect functions to the global window scope
+    // Connect functions to the global window
     window.saveSheetToFirebase = saveSheetToFirebase;
     window.loadSheetFromFirebase = loadSheetFromFirebase;
 
-    // Hijack your current date loading code logic to fetch from Firebase as well!
+    // Hijack date changing logic
     const nativeLoadDateSheet = window.loadDateSheet;
     window.loadDateSheet = function() {
         if (typeof nativeLoadDateSheet === "function") nativeLoadDateSheet();
-        // Fire off our cloud check whenever a calendar date swaps or initiates
         setTimeout(() => { loadSheetFromFirebase(); }, 200);
     };
+
+    // FORCE INITIAL LOAD: Wait a tiny bit for the UI to build, then fetch data
+    setTimeout(() => { loadSheetFromFirebase(); }, 800);
 
   </script>
 </body>
