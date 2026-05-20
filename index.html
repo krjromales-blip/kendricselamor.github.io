@@ -1,4 +1,6 @@
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,7 +14,8 @@
            Change the URL below to use your own wallpaper
            ============================================ */
         :root {
-            --custom-wallpaper-url: url('https://raw.githubusercontent.com/krjromales-blip/krjromales-blip/main/1000051971.png');
+            /* Updated to use your local back.jpg image */
+            --custom-wallpaper-url: url('back.jpg');
             --wallpaper-overlay: rgba(42, 59, 50, 0.55);
         }
 
@@ -35,7 +38,8 @@
             height: 100vh;
             background-image: var(--custom-wallpaper-url);
             background-size: cover;
-            background-position: center;
+            /* Adjusted positioning to keep the logo right under the text */
+            background-position: center 20%; 
             background-attachment: fixed;
             z-index: -10;
             pointer-events: none;
@@ -3464,6 +3468,227 @@
         });
     }, 800);
 
-  </script>
+</script> <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- UI Setup ---
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+
+    const importBtn = document.createElement('button');
+    importBtn.className = 'control-btn btn-green';
+    importBtn.innerHTML = '📥 Import Extract Data';
+    importBtn.onclick = () => fileInput.click();
+
+    const controlsArea = document.querySelector('.sheet-actions') 
+        || document.querySelector('.controls-row') 
+        || document.body;
+    controlsArea.appendChild(importBtn);
+
+    fileInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, {type: 'array'});
+            const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {header: 1});
+
+            console.log('=== FULL TABLE DIAGNOSTIC ===');
+
+            // --- Find ALL tables and inspect them ---
+            const allTables = Array.from(document.querySelectorAll('table'));
+            console.log('Tables found:', allTables.length);
+
+            let mainTable = null;
+            let headerRow = null;
+            let headers = [];
+
+            // Try to find the table with editable inputs or the most columns
+            for (let t = 0; t < allTables.length; t++) {
+                const table = allTables[t];
+                const trs = table.querySelectorAll('tr');
+                const firstRow = trs[0];
+                const firstRowCells = firstRow ? Array.from(firstRow.querySelectorAll('th, td')) : [];
+                
+                console.log(`Table ${t}: ${trs.length} rows, ${firstRowCells.length} cols`);
+                console.log(`Table ${t} headers:`, firstRowCells.map(c => c.textContent.trim().substring(0, 30)));
+
+                // Heuristic: table with most columns and inputs is likely the data entry table
+                const inputCount = table.querySelectorAll('input').length;
+                if (inputCount > 0 && firstRowCells.length > headers.length) {
+                    mainTable = table;
+                    headerRow = firstRow;
+                    headers = firstRowCells;
+                }
+            }
+
+            // Fallback if no inputs found
+            if (!mainTable && allTables.length > 0) {
+                mainTable = allTables.reduce((a, b) => 
+                    a.querySelectorAll('tr').length > b.querySelectorAll('tr').length ? a : b
+                );
+                headerRow = mainTable.querySelector('thead tr') || mainTable.querySelector('tr');
+                headers = Array.from(headerRow.querySelectorAll('th, td'));
+            }
+
+            if (!mainTable) {
+                alert('No suitable table found!');
+                return;
+            }
+
+            console.log('Selected table rows:', mainTable.querySelectorAll('tr').length);
+            console.log('Selected headers:', headers.map(h => `"${h.textContent.trim()}"`));
+            console.log('Header data-attributes:', headers.map(h => {
+                const attrs = {};
+                for (const attr of h.attributes) attrs[attr.name] = attr.value;
+                return attrs;
+            }));
+
+            // --- Parse CSV ---
+            const csvData = [];
+            for (let i = 1; i < rows.length; i++) {
+                const r = rows[i];
+                if (!r || r.length < 8) continue;
+                const storeCode = String(r[3] || '').trim();
+                const storeName = String(r[4] || '').trim();
+                const sku = String(r[5] || '').trim();
+                const qty = r[7];
+                if (storeCode && sku && qty !== undefined && qty !== '') {
+                    csvData.push({storeCode, storeName, sku, qty});
+                }
+            }
+            console.log('CSV records to import:', csvData.length);
+            console.log('Sample CSV record:', csvData[0]);
+
+            // --- STRATEGY 1: Exact text match (code or name in header) ---
+            const storeToColIndex = {};
+            csvData.forEach(({storeCode, storeName}) => {
+                headers.forEach((th, idx) => {
+                    const hText = th.textContent.trim();
+                    const hData = th.getAttribute('data-store') || th.getAttribute('data-code') || '';
+                    if (hText.includes(storeCode) || hText.includes(storeName) || hData.includes(storeCode)) {
+                        storeToColIndex[storeCode] = idx;
+                    }
+                });
+            });
+
+            // --- STRATEGY 2: Fuzzy match (if exact failed) ---
+            if (Object.keys(storeToColIndex).length === 0) {
+                console.log('Trying fuzzy header match...');
+                csvData.forEach(({storeCode, storeName}) => {
+                    headers.forEach((th, idx) => {
+                        const hText = th.textContent.trim().toLowerCase();
+                        const codeLower = storeCode.toLowerCase();
+                        const nameLower = storeName.toLowerCase();
+                        // Check if any word in header matches store code pattern or name
+                        if (hText.includes(codeLower) || 
+                            nameLower.split(' ').some(word => word.length > 3 && hText.includes(word))) {
+                            storeToColIndex[storeCode] = idx;
+                        }
+                    });
+                });
+            }
+
+            console.log('Final store map:', storeToColIndex);
+
+            // --- Get data rows (skip header) ---
+            const allRows = Array.from(mainTable.querySelectorAll('tr'));
+            const dataRows = allRows.filter(tr => tr !== headerRow && !tr.contains(headerRow));
+
+            // --- STRATEGY A: SKU in text content ---
+            let skuToRowMap = {};
+            dataRows.forEach(tr => {
+                const text = tr.textContent;
+                csvData.forEach(({sku}) => {
+                    if (text.includes(sku)) skuToRowMap[sku] = tr;
+                });
+            });
+
+            // --- STRATEGY B: SKU in data attributes ---
+            if (Object.keys(skuToRowMap).length === 0) {
+                console.log('Trying data-attribute SKU match...');
+                dataRows.forEach(tr => {
+                    const allData = Array.from(tr.querySelectorAll('*')).map(el => 
+                        el.getAttribute('data-sku') || el.getAttribute('data-item') || el.getAttribute('data-code') || ''
+                    ).join(' ');
+                    csvData.forEach(({sku}) => {
+                        if (allData.includes(sku)) skuToRowMap[sku] = tr;
+                    });
+                });
+            }
+
+            // --- STRATEGY C: SKU in input values or names ---
+            if (Object.keys(skuToRowMap).length === 0) {
+                console.log('Trying input value SKU match...');
+                dataRows.forEach(tr => {
+                    const inputs = Array.from(tr.querySelectorAll('input'));
+                    const inputValues = inputs.map(inp => (inp.name || '') + ' ' + (inp.value || '') + ' ' + (inp.getAttribute('data-sku') || '')).join(' ');
+                    csvData.forEach(({sku}) => {
+                        if (inputValues.includes(sku)) skuToRowMap[sku] = tr;
+                    });
+                });
+            }
+
+            console.log('SKU rows found:', Object.keys(skuToRowMap).length);
+            if (Object.keys(skuToRowMap).length > 0) {
+                console.log('Sample SKU match:', Object.keys(skuToRowMap)[0], '->', skuToRowMap[Object.keys(skuToRowMap)[0]].textContent.substring(0, 100));
+            } else {
+                // Dump first few rows for inspection
+                console.log('First 3 data rows text:');
+                dataRows.slice(0, 3).forEach((tr, i) => {
+                    console.log(`Row ${i}:`, tr.textContent.substring(0, 200));
+                });
+            }
+
+            // --- IMPORT ---
+            let success = 0;
+            let failStore = 0;
+            let failSku = 0;
+            const results = [];
+
+            for (const {storeCode, storeName, sku, qty} of csvData) {
+                const colIndex = storeToColIndex[storeCode];
+                if (colIndex === undefined) {
+                    failStore++;
+                    continue;
+                }
+                const tr = skuToRowMap[sku];
+                if (!tr) {
+                    failSku++;
+                    continue;
+                }
+
+                const cells = Array.from(tr.querySelectorAll('td, th'));
+                const cell = cells[colIndex];
+                if (!cell) continue;
+
+                const input = cell.querySelector('input');
+                if (input) {
+                    input.value = qty;
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                } else {
+                    cell.innerText = qty;
+                }
+                success++;
+                results.push(`✓ ${sku} @ ${storeCode} (col ${colIndex}) = ${qty}`);
+            }
+
+            console.log('=== IMPORT RESULTS ===');
+            console.log(results.join('\n'));
+            alert(`Import Results:\n✓ Success: ${success}\n✗ Store not found: ${failStore}\n✗ SKU not found: ${failSku}\n\nCheck console (F12) for full diagnostic.`);
+
+            if (typeof window.calculateAll === "function") window.calculateAll();
+        };
+        reader.readAsArrayBuffer(file);
+    });
+});
+</script>
+
 </body>
 </html>
