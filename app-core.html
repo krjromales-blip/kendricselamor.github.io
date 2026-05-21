@@ -693,9 +693,8 @@
     <div class="wallpaper-pattern"></div>
 
     <!-- Video Layer (on top of wallpaper if it loads) -->
-    <video id="bg-video" autoplay loop muted playsinline
+    <video id="bg-video" autoplay muted loop playsinline
 style="
-display:block;
 position:fixed;
 top:0;
 left:0;
@@ -705,9 +704,7 @@ object-fit:cover;
 z-index:-7;
 opacity:0.35;
 pointer-events:none;
-">
-    <source src="bg.mp4" type="video/mp4">
-</video>
+display:block;
 ">
     <source src="bg.mp4" type="video/mp4">
 </video>
