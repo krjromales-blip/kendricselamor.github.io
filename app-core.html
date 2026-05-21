@@ -693,9 +693,21 @@
     <div class="wallpaper-pattern"></div>
 
     <!-- Video Layer (on top of wallpaper if it loads) -->
-    <video id="bg-video" autoplay loop muted playsinline style="display: none;">
-        <source src="https://www.manna360.com.sg/media/wysiwyg/krispy-kreme.mp4" type="video/mp4">
-    </video>
+    <video id="bg-video" autoplay loop muted playsinline
+style="
+display:block;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+object-fit:cover;
+z-index:-7;
+opacity:0.35;
+pointer-events:none;
+">
+    <source src="bg.mp4" type="video/mp4">
+</video>
 
     <!-- Loading Indicator -->
     <div id="cloud-loader" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9998; justify-content: center; align-items: center;">
