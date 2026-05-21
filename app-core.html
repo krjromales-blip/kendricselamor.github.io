@@ -104,18 +104,28 @@
         }
 
         .container-custom {
-            max-width: 1400px;
-            margin: 0 auto;
-            position: relative;
-            padding: 20px; 
-            background: transparent;
-            backdrop-filter: none;
-            box-shadow: none;
-            border-radius: 8px;
-            overflow: hidden;
-            transition: background 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
-        }
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    padding: 20px; 
+    background: transparent;
+    backdrop-filter: none;
+    box-shadow: none;
+    border-radius: 8px;
+    overflow: hidden;
+    /* Updated transition to include the transform and opacity for the drawer */
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease, background 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
+    
+    /* Start off-screen to the left */
+    transform: translateX(-100%); 
+    opacity: 0; 
+}
 
+/* The active state that brings the container into view */
+.container-custom.drawer-open {
+    transform: translateX(0);
+    opacity: 1;
+}
         .bond-paper-container {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(8px);
@@ -3730,6 +3740,16 @@ window.addEventListener('load', function () {
             if(mainView && mainView.classList.contains('ui-hidden')){
                 safeRun('toggleMainUI');
             }
+
+            // === ADDED DRAWER EFFECT ===
+            const mainContainer = document.querySelector('.container-custom');
+            if (mainContainer) {
+                setTimeout(() => {
+                    mainContainer.classList.add('drawer-open');
+                }, 100); 
+            }
+            // ===========================
+
         } catch(err){
             console.log('Routing error:', err);
         }
